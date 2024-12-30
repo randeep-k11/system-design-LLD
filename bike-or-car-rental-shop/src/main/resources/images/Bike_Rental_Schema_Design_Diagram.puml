@@ -1,0 +1,41 @@
+@startuml
+entity Product {
+  * product_id : BIGINT [PK]
+  * type : ENUM('bike', 'scooter')
+  * is_available : BOOLEAN
+  * rental_price_per_hour : FLOAT
+  * rental_price_per_day : FLOAT
+}
+
+entity Bike {
+  * bike_id : BIGINT [PK, FK → Product.product_id]
+  * size : ENUM('small', 'medium', 'large')
+}
+
+entity Scooter {
+  * scooter_id : BIGINT [PK, FK → Product.product_id]
+  * motor_type : ENUM('electric', 'gas')
+}
+
+entity Customer {
+  * customer_id : BIGINT [PK]
+  * name : VARCHAR
+  * contact_details : VARCHAR
+  * balance : FLOAT
+}
+
+entity Rental {
+  * rental_id : BIGINT [PK]
+  * product_id : BIGINT [FK → Product.product_id]
+  * customer_id : BIGINT [FK → Customer.customer_id]
+  * rental_start_date : DATETIME
+  * expected_return_date : DATETIME
+  * actual_return_date : DATETIME (nullable)
+  * is_overdue : BOOLEAN
+}
+
+Product ||--|{ Bike
+Product ||--|{ Scooter
+Rental }|--|| Product
+Rental }|--|| Customer
+@enduml

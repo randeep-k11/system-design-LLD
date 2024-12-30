@@ -1,0 +1,58 @@
+
+@startuml
+actor Customer
+actor Admin
+
+database RentalDB
+
+participant "ProductController" as ProductC
+participant "CustomerController" as CustomerC
+participant "RentalController" as RentalC
+
+participant "ProductService" as ProductS
+participant "CustomerService" as CustomerS
+participant "RentalService" as RentalS
+
+participant "ProductRepository" as ProductRepo
+participant "CustomerRepository" as CustomerRepo
+participant "RentalRepository" as RentalRepo
+
+Customer -> CustomerC: Add Customer Details
+CustomerC -> CustomerS: saveCustomer(customerData)
+CustomerS -> CustomerRepo: save(customer)
+CustomerRepo --> CustomerS: Customer Saved
+CustomerS --> CustomerC: Customer Added
+CustomerC --> Customer: Customer Created Successfully
+
+Admin -> ProductC: Add Product
+ProductC -> ProductS: saveProduct(productData)
+ProductS -> ProductRepo: save(product)
+ProductRepo --> ProductS: Product Saved
+ProductS --> ProductC: Product Added
+ProductC --> Admin: Product Added Successfully
+
+Customer -> RentalC: Request Rental (productId, customerId, duration)
+RentalC -> RentalS: recordRental(productId, customerId, duration)
+RentalS -> ProductRepo: findById(productId)
+ProductRepo --> RentalS: Product Data
+RentalS -> ProductRepo: Update Product (mark as unavailable)
+ProductRepo --> RentalS: Product Updated
+RentalS -> RentalRepo: save(rental)
+RentalRepo --> RentalS: Rental Saved
+RentalS --> RentalC: Rental Recorded
+RentalC --> Customer: Rental Success
+
+Admin -> ProductC: Get Available Products
+ProductC -> ProductS: getAvailableProducts()
+ProductS -> ProductRepo: findAll()
+ProductRepo --> ProductS: All Products
+ProductS --> ProductC: Available Products
+ProductC --> Admin: Available Products List
+
+Admin -> RentalC: Get Overdue Rentals
+RentalC -> RentalS: getOverdueRentals()
+RentalS -> RentalRepo: findAll()
+RentalRepo --> RentalS: All Rentals
+RentalS --> RentalC: Overdue Rentals
+RentalC --> Admin: Overdue Rentals List
+@enduml

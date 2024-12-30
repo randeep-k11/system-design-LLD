@@ -1,0 +1,82 @@
+
+@startuml
+!pragma layout smetana
+class Product {
+  - Long id
+  - String type
+  - boolean isAvailable
+  - double rentalPricePerHour
+  - double rentalPricePerDay
+  + Product(String type, double rentalPricePerHour, double rentalPricePerDay)
+}
+
+class Bike extends Product {
+  - String size
+  + Bike(String size, double rentalPricePerHour, double rentalPricePerDay)
+}
+
+class Scooter extends Product {
+  - String motorType
+  + Scooter(String motorType, double rentalPricePerHour, double rentalPricePerDay)
+}
+
+class Customer {
+  - Long id
+  - String name
+  - String contactDetails
+  - double balance
+  + Customer(String name, String contactDetails)
+}
+
+class Rental {
+  - Long id
+  - Long productId
+  - Long customerId
+  - Date rentalStartDate
+  - Date expectedReturnDate
+  - Date actualReturnDate
+  - boolean isOverdue
+  + Rental(Long productId, Long customerId, Date rentalStartDate, Date expectedReturnDate)
+}
+
+class ProductRepository {
+  + save(Product product): Product
+  + findAll(): List<Product>
+  + findById(Long id): Product
+}
+
+class CustomerRepository {
+  + save(Customer customer): Customer
+  + findById(Long id): Customer
+}
+
+class RentalRepository {
+  + save(Rental rental): Rental
+  + findAll(): List<Rental>
+}
+
+class ProductService {
+  + getAvailableProducts(): List<Product>
+  + addProduct(Product product): Product
+  + removeProduct(Long productId)
+}
+
+class CustomerService {
+  + addCustomer(Customer customer): Customer
+  + getCustomerById(Long id): Customer
+}
+
+class RentalService {
+  + recordRental(Long productId, Long customerId, int duration): Rental
+}
+
+ProductService --> ProductRepository
+CustomerService --> CustomerRepository
+RentalService --> RentalRepository
+RentalService --> ProductRepository
+
+Bike --> Product
+Scooter --> Product
+Rental --> Product
+Rental --> Customer
+@enduml
