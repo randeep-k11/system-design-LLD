@@ -7,6 +7,9 @@ import jakarta.persistence.Id;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Data
 @Entity
 @NoArgsConstructor
@@ -20,9 +23,9 @@ public class Customer {
     private String contactDetails;
     private double balance;
 
-    public Customer(String name, String contactDetails, double balance) {
+    public Customer(String name, String contactDetails) {
         this.name = name;
         this.contactDetails = contactDetails;
-        this.balance = balance;
+        this.balance = 0;
     }
 }

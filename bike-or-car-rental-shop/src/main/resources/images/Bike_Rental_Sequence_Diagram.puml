@@ -1,58 +1,52 @@
-
 @startuml
 actor Customer
-actor Admin
 
-database RentalDB
+participant "API Gateway" as APIG
+participant "Product Service" as PS
+participant "Customer Service" as CS
+participant "Rental Service" as RS
 
-participant "ProductController" as ProductC
-participant "CustomerController" as CustomerC
-participant "RentalController" as RentalC
+== Adding a Product to Inventory ==
+Customer -> APIG: POST /v1/products
+APIG -> PS: addProduct(product)
+PS --> APIG: Product Added
+APIG --> Customer: Product Added
 
-participant "ProductService" as ProductS
-participant "CustomerService" as CustomerS
-participant "RentalService" as RentalS
+== Removing a Product from Inventory ==
+Customer -> APIG: PATCH /v1/products/{id}
+APIG -> PS: updateProductStatus(id, isAvailable=false, isDamaged=true)
+PS --> APIG: Product Updated
+APIG --> Customer: Product Updated
 
-participant "ProductRepository" as ProductRepo
-participant "CustomerRepository" as CustomerRepo
-participant "RentalRepository" as RentalRepo
+== Adding a Customer ==
+Customer -> APIG: POST /v1/customers
+APIG -> CS: addCustomer(customer)
+CS --> APIG: Customer Added
+APIG --> Customer: Customer Added
 
-Customer -> CustomerC: Add Customer Details
-CustomerC -> CustomerS: saveCustomer(customerData)
-CustomerS -> CustomerRepo: save(customer)
-CustomerRepo --> CustomerS: Customer Saved
-CustomerS --> CustomerC: Customer Added
-CustomerC --> Customer: Customer Created Successfully
+== Checking Customer Balance ==
+Customer -> APIG: GET /v1/customers/{id}/balance
+APIG -> CS: getCustomerBalance(id)
+CS --> APIG: { balance, hasEnoughBalance }
+APIG --> Customer: { balance, hasEnoughBalance }
 
-Admin -> ProductC: Add Product
-ProductC -> ProductS: saveProduct(productData)
-ProductS -> ProductRepo: save(product)
-ProductRepo --> ProductS: Product Saved
-ProductS --> ProductC: Product Added
-ProductC --> Admin: Product Added Successfully
+== Renting a Product ==
+Customer -> APIG: POST /v1/rentals
+APIG -> RS: recordRental(productId, customerId, rentalStartDate, expectedReturnDate)
+RS -> PS: validateProductAvailability(productId)
+RS -> CS: validateCustomerBalance(customerId)
+RS --> APIG: Rental Recorded
+APIG --> Customer: Rental Details
 
-Customer -> RentalC: Request Rental (productId, customerId, duration)
-RentalC -> RentalS: recordRental(productId, customerId, duration)
-RentalS -> ProductRepo: findById(productId)
-ProductRepo --> RentalS: Product Data
-RentalS -> ProductRepo: Update Product (mark as unavailable)
-ProductRepo --> RentalS: Product Updated
-RentalS -> RentalRepo: save(rental)
-RentalRepo --> RentalS: Rental Saved
-RentalS --> RentalC: Rental Recorded
-RentalC --> Customer: Rental Success
+== Listing Overdue Rentals ==
+Customer -> APIG: GET /v1/rentals/overdue
+APIG -> RS: getOverdueRentals()
+RS --> APIG: List of Overdue Rentals
+APIG --> Customer: List of Overdue Rentals
 
-Admin -> ProductC: Get Available Products
-ProductC -> ProductS: getAvailableProducts()
-ProductS -> ProductRepo: findAll()
-ProductRepo --> ProductS: All Products
-ProductS --> ProductC: Available Products
-ProductC --> Admin: Available Products List
-
-Admin -> RentalC: Get Overdue Rentals
-RentalC -> RentalS: getOverdueRentals()
-RentalS -> RentalRepo: findAll()
-RentalRepo --> RentalS: All Rentals
-RentalS --> RentalC: Overdue Rentals
-RentalC --> Admin: Overdue Rentals List
+== Charging a Customer ==
+Customer -> APIG: PATCH /v1/customers/{id}/charge
+APIG -> CS: chargeCustomer(id, amount)
+CS --> APIG: Updated Customer Balance
+APIG --> Customer: Updated Customer Balance
 @enduml

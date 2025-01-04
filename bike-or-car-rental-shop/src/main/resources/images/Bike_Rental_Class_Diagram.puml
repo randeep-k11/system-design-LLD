@@ -1,82 +1,64 @@
-
 @startuml
-!pragma layout smetana
 class Product {
   - Long id
-  - String type
+  - String type // BIKE or SCOOTER
   - boolean isAvailable
-  - double rentalPricePerHour
-  - double rentalPricePerDay
-  + Product(String type, double rentalPricePerHour, double rentalPricePerDay)
+  - boolean isDamaged
+  - double rentalPerHour
+  - double rentalPerDay
 }
 
 class Bike extends Product {
-  - String size
-  + Bike(String size, double rentalPricePerHour, double rentalPricePerDay)
+  - String size // Small, Medium, Large
 }
 
 class Scooter extends Product {
-  - String motorType
-  + Scooter(String motorType, double rentalPricePerHour, double rentalPricePerDay)
+  - String motorStyle // Gas or Electric
 }
 
 class Customer {
   - Long id
   - String name
-  - String contactDetails
+  - String email
+  - String contactNumber
+  - String address
   - double balance
-  + Customer(String name, String contactDetails)
 }
 
 class Rental {
-  - Long id
-  - Long productId
-  - Long customerId
+  - Long rentalId
+  - Product
+  - Customer
   - Date rentalStartDate
   - Date expectedReturnDate
   - Date actualReturnDate
   - boolean isOverdue
-  + Rental(Long productId, Long customerId, Date rentalStartDate, Date expectedReturnDate)
-}
-
-class ProductRepository {
-  + save(Product product): Product
-  + findAll(): List<Product>
-  + findById(Long id): Product
-}
-
-class CustomerRepository {
-  + save(Customer customer): Customer
-  + findById(Long id): Customer
-}
-
-class RentalRepository {
-  + save(Rental rental): Rental
-  + findAll(): List<Rental>
+  - double rentalAmount
 }
 
 class ProductService {
+  + addProduct(Product): Product
+  + updateProductStatus(Long id, boolean isAvailable, boolean isDamaged): Product
   + getAvailableProducts(): List<Product>
-  + addProduct(Product product): Product
-  + removeProduct(Long productId)
+  + getProductCount(String type, String size): int
 }
 
 class CustomerService {
-  + addCustomer(Customer customer): Customer
-  + getCustomerById(Long id): Customer
+  + addCustomer(Customer): Customer
+  + getCustomerBalance(Long id): double
+  + chargeCustomer(Long id, double amount): Customer
 }
 
 class RentalService {
-  + recordRental(Long productId, Long customerId, int duration): Rental
+  + recordRental(Long productId, Long customerId, Date rentalStartDate, Date expectedReturnDate): Rental
+  + getRentedProducts(): List<Product>
+  + getOverdueRentals(): List<Rental>
+  + getCustomerRentals(Long customerId): List<Rental>
 }
 
-ProductService --> ProductRepository
-CustomerService --> CustomerRepository
-RentalService --> RentalRepository
-RentalService --> ProductRepository
-
-Bike --> Product
-Scooter --> Product
+ProductService --> Product
+CustomerService --> Customer
+RentalService --> Rental
 Rental --> Product
 Rental --> Customer
 @enduml

@@ -1,41 +1,37 @@
 @startuml
 entity Product {
-  * product_id : BIGINT [PK]
-  * type : ENUM('bike', 'scooter')
-  * is_available : BOOLEAN
-  * rental_price_per_hour : FLOAT
-  * rental_price_per_day : FLOAT
-}
-
-entity Bike {
-  * bike_id : BIGINT [PK, FK → Product.product_id]
-  * size : ENUM('small', 'medium', 'large')
-}
-
-entity Scooter {
-  * scooter_id : BIGINT [PK, FK → Product.product_id]
-  * motor_type : ENUM('electric', 'gas')
+  * id: Long [PK]
+  * type: String // BIKE or SCOOTER
+  * isAvailable: boolean
+  * isDamaged: boolean
+  * rentalPerHour: double
+  * rentalPerDay: double
+  -- BIKE-specific attributes
+  * size: String // Small, Medium, Large
+  -- SCOOTER-specific attributes
+  * motorStyle: String // Gas or Electric
 }
 
 entity Customer {
-  * customer_id : BIGINT [PK]
-  * name : VARCHAR
-  * contact_details : VARCHAR
-  * balance : FLOAT
+  * id: Long [PK]
+  * name: String
+  * email: String
+  * contactNumber: String
+  * address: String
+  * balance: double
 }
 
 entity Rental {
-  * rental_id : BIGINT [PK]
-  * product_id : BIGINT [FK → Product.product_id]
-  * customer_id : BIGINT [FK → Customer.customer_id]
-  * rental_start_date : DATETIME
-  * expected_return_date : DATETIME
-  * actual_return_date : DATETIME (nullable)
-  * is_overdue : BOOLEAN
+  * rentalId: Long [PK]
+  * productId: Long [FK]
+  * customerId: Long [FK]
+  * rentalStartDate: Date
+  * expectedReturnDate: Date
+  * actualReturnDate: Date
+  * isOverdue: boolean
+  * rentalAmount: double
 }
 
-Product ||--|{ Bike
-Product ||--|{ Scooter
-Rental }|--|| Product
-Rental }|--|| Customer
+Product "1" <-- "*" Rental : rented_by
+Customer "1" <-- "*" Rental : associated_with
 @enduml

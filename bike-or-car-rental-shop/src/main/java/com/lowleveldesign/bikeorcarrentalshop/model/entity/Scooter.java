@@ -1,5 +1,7 @@
 package com.lowleveldesign.bikeorcarrentalshop.model.entity;
 
+import com.lowleveldesign.bikeorcarrentalshop.model.enums.MotorStyle;
+import com.lowleveldesign.bikeorcarrentalshop.model.enums.ProductType;
 import jakarta.persistence.Entity;
 import lombok.NoArgsConstructor;
 
@@ -7,10 +9,10 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class Scooter extends Product {
 
-    private String motorType;
+    private MotorStyle motorStyle;
 
-    public Scooter(String motorType, double rentalPricePerHour, double rentalPricePerDay) {
-        super("Scooter", rentalPricePerHour, rentalPricePerDay);
-        this.motorType = motorType;
+    public Scooter(MotorStyle motorStyle, double rentalPricePerHour, double rentalPricePerDay) {
+        super(ProductType.SCOOTER, rentalPricePerHour, rentalPricePerDay);
+        this.motorStyle = motorStyle;
     }
 }
