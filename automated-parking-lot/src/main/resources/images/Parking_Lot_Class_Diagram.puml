@@ -1,0 +1,129 @@
+package images;
+
+@startuml
+
+enum VehicleType {
+    CAR
+    BIKE
+    TRUCK
+}
+
+enum ParkingSlotStatus {
+    AVAILABLE
+    OCCUPIED
+    RESERVED
+}
+
+enum PaymentMethod {
+    CASH
+    UPI
+}
+
+class Vehicle {
+    - vehicleId: UUID
+    - licensePlateNumber: String
+    - vehicleType: VehicleType
+    + getVehicleId(): UUID
+    + getLicensePlateNumber(): String
+    + getVehicleType(): VehicleType
+}
+
+class ParkingSpot {
+    - spotId: String
+    - status: ParkingSlotStatus
+    - parkedVehicle: Vehicle
+    - allowedVehicleType: VehicleType
+    + getSpotId(): String
+    + getStatus(): ParkingSlotStatus
+    + parkVehicle(vehicle: Vehicle): void
+    + removeVehicle(): void
+    + getParkedVehicle(): Vehicle
+}
+
+class Ticket {
+    - ticketId: UUID
+    - entryTime: LocalDateTime
+    - exitTime: LocalDateTime
+    - parkingSpotId: String
+    - vehicle: Vehicle
+    - parkingCharge: double
+    + getTicketId(): UUID
+    + getEntryTime(): LocalDateTime
+    + getExitTime(): LocalDateTime
+    + setExitTime(exitTime: LocalDateTime): void
+    + getParkingSpotId(): String
+    + getVehicle(): Vehicle
+    + getParkingCharge(): double
+    + setParkingCharge(charge: double): void
+}
+
+class ParkingSpotRepository {
+    + findAvailableSpot(): ParkingSpot
+    + updateSpot(spot: ParkingSpot): void
+}
+
+class VehicleRepository {
+    + save(vehicle: Vehicle): void
+    + findById(id: UUID): Vehicle
+    + update(vehicle: Vehicle): void
+}
+
+class TicketRepository {
+    + save(ticket: Ticket): void
+    + findById(id: UUID): Ticket
+    + update(ticket: Ticket): void
+}
+
+interface ITicketService {
+    + createTicket(parkingSpotId: String, vehicle: Vehicle): Ticket
+    + closeTicket(ticket: Ticket, paymentMethod: PaymentMethod): void
+    + getTicketById(id: UUID): Ticket
+}
+
+class ChargesServiceImpl {
+    + calculateCharges(vehicleType: VehicleType, entryTime: LocalDateTime, exitTime: LocalDateTime): double
+}
+
+interface PaymentStrategy {
+    + processPayment(amount: double): void
+}
+
+class CashPaymentStrategy {
+    + processPayment(amount: double): void
+}
+
+class UpiPaymentStrategy {
+    + processPayment(amount: double): void
+}
+
+interface ParkingSpotStrategy {
+    + findSpot(): Optional<ParkingSpot>
+}
+
+class NearestParkingSpotStrategy {
+    + findSpot(): Optional<ParkingSpot>
+}
+
+class ParkingLot {
+    - parkingSpotRepository: ParkingSpotRepository
+    - ticketService: ITicketService
+    + assignParkingSpot(vehicle: Vehicle, strategy: ParkingSpotStrategy): Ticket
+    + releaseParkingSpot(ticket: Ticket, paymentMethod: PaymentMethod): void
+}
+
+Vehicle --> VehicleType
+ParkingSpot --> ParkingSlotStatus
+ParkingSpot --> Vehicle
+ParkingSpot --> VehicleType
+Ticket --> Vehicle
+Ticket --> ParkingSpot
+ParkingLot --> ParkingSpotRepository
+ParkingLot --> ITicketService
+ParkingSpotRepository --> ParkingSpot
+TicketRepository --> Ticket
+ChargesServiceImpl ..|> ITicketService
+CashPaymentStrategy ..|> PaymentStrategy
+UpiPaymentStrategy ..|> PaymentStrategy
+NearestParkingSpotStrategy ..|> ParkingSpotStrategy
+
+@enduml

@@ -1,0 +1,71 @@
+package images;
+
+@startuml
+
+entity "Vehicles" {
+    * vehicle_id : UUID <<PK>>
+    --
+    license_plate_number : VARCHAR(20)
+    vehicle_type : VARCHAR(10)
+    vehicle_size : vehicle_size
+    created_at : TIMESTAMP
+    updated_at : TIMESTAMP
+}
+
+entity "ParkingSpots" {
+    * spot_id : VARCHAR(10) <<PK>>
+    --
+    status : parking_spot_status
+    spot_size : parking_spot_size
+    current_vehicle_id : UUID <<FK>> (Vehicles.vehicle_id)
+    created_at : TIMESTAMP
+    updated_at : TIMESTAMP
+}
+
+entity "Tickets" {
+    * ticket_id : UUID <<PK>>
+    --
+    entry_time : TIMESTAMP
+    exit_time : TIMESTAMP
+    parking_spot_id : VARCHAR(10) <<FK>> (ParkingSpots.spot_id)
+    vehicle_id : UUID <<FK>> (Vehicles.vehicle_id)
+    parking_charge : DOUBLE PRECISION
+    payment_status : payment_status
+    payment_method : payment_method
+    status : ticket_status
+    created_at : TIMESTAMP
+    updated_at : TIMESTAMP
+}
+
+entity "Payments" {
+    * payment_id : UUID <<PK>>
+    --
+    ticket_id : UUID <<FK>> (Tickets.ticket_id)
+    amount : DOUBLE PRECISION
+    payment_method : INT <<FK>> (PaymentMethods.method_id)
+    status : INT <<FK>> (PaymentStatuses.status_id)
+    transaction_time : TIMESTAMP
+}
+
+entity "PaymentMethods" {
+    * method_id : INT <<PK>>
+    --
+    method_name : VARCHAR(20)
+}
+
+entity "PaymentStatuses" {
+    * status_id : INT <<PK>>
+    --
+    status_name : VARCHAR(20)
+}
+
+' Relationships
+Vehicles ||-o{ ParkingSpots
+Vehicles ||-o{ Tickets
+ParkingSpots ||-o{ Tickets
+Tickets ||-o{ Payments
+PaymentMethods ||- Payments
+PaymentStatuses ||- Payments
+
+@enduml
+

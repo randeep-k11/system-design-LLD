@@ -1,0 +1,35 @@
+package images;
+
+@startuml
+actor "Customer" as Customer
+participant "Parking System" as System
+participant "Database" as DB
+
+Customer -> System : Enter Parking Lot
+System -> DB : Check Available Parking Spots
+DB --> System : Return Spot Availability
+alt Spot Available
+    System -> Customer : Display Spot Assignment
+    Customer -> System : Provide Vehicle Details
+    System -> DB : Save Vehicle and Ticket Details
+    DB --> System : Confirm Ticket Created
+    System -> Customer : Issue Ticket
+else No Spot Available
+    System -> Customer : Notify No Spot Available
+end
+
+Customer -> System : Exit Parking Lot
+System -> DB : Retrieve Ticket Details
+DB --> System : Return Ticket Details
+System -> Customer : Show Parking Charge
+Customer -> System : Make Payment
+System -> DB : Update Payment Status
+DB --> System : Confirm Payment Status
+System -> Customer : Acknowledge Payment
+System -> DB : Update Ticket as Completed
+DB --> System : Confirm Ticket Status
+System -> Customer : Exit Granted
+
+@enduml
+
+
