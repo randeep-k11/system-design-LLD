@@ -29,9 +29,8 @@ entity "Tickets" {
     exit_time : TIMESTAMP
     parking_spot_id : VARCHAR(10) <<FK>> (ParkingSpots.spot_id)
     vehicle_id : UUID <<FK>> (Vehicles.vehicle_id)
+    payment_id : UUID <<FK>> (Payments.payment_id)
     parking_charge : DOUBLE PRECISION
-    payment_status : payment_status
-    payment_method : payment_method
     status : ticket_status
     created_at : TIMESTAMP
     updated_at : TIMESTAMP
@@ -68,4 +67,5 @@ PaymentMethods ||- Payments
 PaymentStatuses ||- Payments
 
 @enduml
+
 
